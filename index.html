@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container">
+        <h1>User Management - Demonstrator - 02nd June, 2023</h1>
+
+        <!-- Read Users Table -->
+        <h2>Users</h2>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>Message</th>
+                </tr>
+            </thead>
+            <tbody id="userTableBody">
+                <!-- Table rows will be populated dynamically using JavaScript -->
+            </tbody>
+        </table>
+
+        <!-- Create User Form -->
+        <h2>Create User</h2>
+        <form id="createUserForm" method="post">
+            <div class="mb-3">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" class="form-control" id="name" name="name" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <input type="text" class="form-control" id="message" name="message" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Create</button>
+        </form>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Function to fetch users from the API
+        function fetchUsers() {
+            const url = 'https://48raozvc0b.execute-api.eu-west-3.amazonaws.com/dev/users/';
+
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const users = JSON.parse(data.body).items; // we take items in the body. (cfr. payload)
+                    const tableBody = document.getElementById('userTableBody');
+
+                    // Clear existing rows
+                    tableBody.innerHTML = '';
+
+                    // Populate table rows with user data
+					
+						// a line a in table is  <tr>...</tr>
+						// a column in a table is <td>...</td>
+						//
+						// So one line with two columns is : 
+						//	<tr>
+						// 		<td>value 1</td><td>value 2</td>
+						//	</tr>
+					
+                    users.forEach(user => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = '<td>' + user.messageID + '</td>' +
+										'<td>' + user.name + '</td>' +
+										'<td>' + user.email + '</td>' +
+										'<td>' + user.message + '</td>';
+
+                        tableBody.appendChild(row);
+                    });
+                })
+                .catch(error => {
+                    console.error('Unable to fetch users. Error:', error);
+                });
+        }
+
+           // Function to create a new user using the API
+        function createUser(event) {
+            event.preventDefault();
+
+            const form = event.target;
+            const name = form.name.value;
+            const email = form.email.value;
+            const message = form.message.value;
+            const url = 'https://48raozvc0b.execute-api.eu-west-3.amazonaws.com/dev/users/';
+
+            const newUser = {
+                name: name,
+                email: email,
+                message: message
+            };
+
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(newUser)
+            })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('User created successfully:', data);
+                    // Refresh the user table to display the newly created user, by calling the fetchUsers() function :-)
+                    fetchUsers();
+                    // Reset the form
+                    form.reset();
+                })
+                .catch(error => {
+                    console.error('Unable to create user. Error:', error);
+                });
+        }
+
+        // Fetch users when the page loads
+        fetchUsers();
+
+        // Add event listener to the form submit event
+		// when we click on submit, we trig the createUser() function
+        document.getElementById('createUserForm').addEventListener('submit', createUser);
+    </script>
+</body>
+</html>
