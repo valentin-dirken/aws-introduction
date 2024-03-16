@@ -88,3 +88,26 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps({'message': 'Items retrieved successfully', 'items': joined_results}, cls=JSONEncoder)
     }
+
+'''
+Comment
+-------
+
+The line joined_result = {**vet_details, **hospital_details} is using dictionary unpacking to merge the dictionaries vet_details and hospital_details into a single dictionary named joined_result.
+
+In Python, the ** syntax is used for dictionary unpacking, which allows you to merge dictionaries into a new dictionary. This is a concise way to combine the key-value pairs of two dictionaries into one.
+
+For example, if 
+    vet_details is 
+        {'name': 'John', 'age': 18} 
+        
+    and 
+    hospital_details is 
+        {'hospital': 'ABC Hospital', 'city': 'New York'}
+        
+    then after executing 
+        joined_result = {**vet_details, **hospital_details}
+        
+    the value of joined_result will be 
+        {'name': 'John', 'age': 18, 'hospital': 'ABC Hospital', 'city': 'New York'}.
+'''
