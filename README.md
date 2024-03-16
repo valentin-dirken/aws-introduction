@@ -1,4 +1,4 @@
-# End-to-End Platform Boilerplate
+# AWS Introduction - End-to-End Platform Boilerplate
 
 ## Overview
 This repository contains a comprehensive boilerplate for building an end-to-end platform on AWS. It covers various components including Lambda functions in Python, DynamoDB, API Gateway, S3, and related configurations. The boilerplate is designed to provide a solid foundation for rapidly developing scalable and resilient serverless applications.
