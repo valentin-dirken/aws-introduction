@@ -1,4 +1,4 @@
-# AWS Introduction - End-to-End Platform Boilerplate
+# AWS Introduction - End-to-End Platform code snippets
 
 ## Overview
 This repository contains a set of code snippets serves as a practical use case for an AWS Introduction course. It covers essential components such as Lambda functions, DynamoDB, API Gateway, S3, and frontend development using HTML, CSS, and JavaScript with Bootstrap 5.
