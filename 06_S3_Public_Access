@@ -1,0 +1,32 @@
+1. Select your bucket
+2. > Properties > scroll down > Static website hosting
+3. Static website hosting > Enable
+4. Index document > index.html
+5. Save changes
+
+6. In permissions > Block public access (bucket settings)
+7. Uncheck and Confirm
+
+8. Edit the Bucket policy with this code
+
+
+
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "PublicReadGetObject",
+            "Effect": "Allow",
+            "Principal": "*",
+            "Action": "s3:GetObject",
+            "Resource": "arn:aws:s3:::NAME_OF_BUCKET/*"
+        }
+    ]
+}
+
+9. Replace NAME_OF_BUCKET by the name of your bucket.
+10. Save changes
+
+11. Upload index.html if not done
+12. The public URL is > Properties > Static website hosting > URL is available
