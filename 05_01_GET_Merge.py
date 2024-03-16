@@ -1,27 +1,25 @@
-import boto3
-import json
+import boto3  # Import the boto3 library for AWS SDK
+import json   # Import the json library for JSON manipulation
+from decimal import Decimal  # Import Decimal class from decimal module for handling Decimal objects
 
-# <Fix> when the DynamoDB field is Decimal : Object of type Decimal is not JSON serializable
-from decimal import *
+# Custom JSON encoder to handle Decimal objects
 class JSONEncoder(json.JSONEncoder):
     def default(self, obj):
         if isinstance(obj, Decimal):
-            return float(obj)
+            return float(obj)  # Convert Decimal to float for JSON serialization
         return json.JSONEncoder.default(self, obj)
-# </Fix>
 
-
-# Création d'un client DynamoDB
-dynamodb = boto3.client('dynamodb')
+# Create a DynamoDB resource
+dynamodb = boto3.resource('dynamodb')
 
 def lambda_handler(event, context):
-    # Reading data from the veterinarians table
     try:
-        veterinaires_response = dynamodb.scan(
-            TableName='veterinaires'
-        )
+        # Scan data from the 'veterinaires' table
+        veterinaires_response = dynamodb.Table('veterinaires').scan()
         veterinaires_items = veterinaires_response['Items']
-    except dynamodb.exceptions.DynamoDBError as e:
+        print(veterinaires_items)  # Print the retrieved items from 'veterinaires' table
+    except dynamodb.meta.client.exceptions.DynamoDBError as e:
+        # Handle exceptions when scanning 'veterinaires' table
         print("ERROR: Unexpected error: Could not scan 'veterinaires' table.")
         print(e)
         return {
@@ -29,13 +27,13 @@ def lambda_handler(event, context):
             'body': str(e)
         }
 
-    # Reading data from the hospitals table
     try:
-        hospitals_response = dynamodb.scan(
-            TableName='hospitals'
-        )
+        # Scan data from the 'hospitals' table
+        hospitals_response = dynamodb.Table('hospitals').scan()
         hospitals_items = hospitals_response['Items']
-    except dynamodb.exceptions.DynamoDBError as e:
+        print(hospitals_items)  # Print the retrieved items from 'hospitals' table
+    except dynamodb.meta.client.exceptions.DynamoDBError as e:
+        # Handle exceptions when scanning 'hospitals' table
         print("ERROR: Unexpected error: Could not scan 'hospitals' table.")
         print(e)
         return {
@@ -43,14 +41,13 @@ def lambda_handler(event, context):
             'body': str(e)
         }
 
-    # Reading data from the vets-hospitals table
     try:
-        vets_hospitals_response = dynamodb.scan(
-            TableName='vets-hospitals'
-        )
+        # Scan data from the 'vets-hospitals' table
+        vets_hospitals_response = dynamodb.Table('vets-hospitals').scan()
         vets_hospitals_items = vets_hospitals_response['Items']
-        print(vets_hospitals_items)
-    except dynamodb.exceptions.DynamoDBError as e:
+        print(vets_hospitals_items)  # Print the retrieved items from 'vets-hospitals' table
+    except dynamodb.meta.client.exceptions.DynamoDBError as e:
+        # Handle exceptions when scanning 'vets-hospitals' table
         print("ERROR: Unexpected error: Could not scan 'vets-hospitals' table.")
         print(e)
         return {
@@ -58,31 +55,36 @@ def lambda_handler(event, context):
             'body': str(e)
         }
 
-    # In-memory join
+    # Perform in-memory join
     joined_results = []
     for vets_hospital_item in vets_hospitals_items:
-        vetsID = vets_hospital_item['vetsID']['S']
-        hospiID = vets_hospital_item.get('hospiID', {}).get('S', None)
+        # Iterate through each item in 'vets_hospitals_items'
+        # Extract the value associated with the 'vetsID' key from the current item
+        vetsID = vets_hospital_item['vetsID']
+        # Use .get() method to safely extract the value associated with the 'hospiID' key from the current item
+        # If 'hospiID' key is not present, hospiID will be None
+        hospiID = vets_hospital_item.get('hospiID')
 
         if hospiID is None:
+            # Handle the case where hospiID is not found in the item from 'vets-hospitals' table
             print("WARNING: hospiID not found in the item from 'vets-hospitals' table.")
             continue
 
-        # Search for veterinarian details
-        vet_details = next((item for item in veterinaires_items if item['vetsID']['S'] == vetsID), None)
+        # Find veterinarian details
+        vet_details = next((item for item in veterinaires_items if item['vetsID'] == vetsID), None)
         if vet_details:
-            vet_details.pop('vetsID')
+            vet_details.pop('vetsID')  # Remove vetsID from veterinarian details
 
-        # Search for hospital details
-        hospital_details = next((item for item in hospitals_items if item.get('hospiID', {}).get('S') == hospiID), None)
+        # Find hospital details
+        hospital_details = next((item for item in hospitals_items if item.get('hospiID') == hospiID), None)
         if hospital_details:
-            hospital_details.pop('hospiID')
+            hospital_details.pop('hospiID')  # Remove hospiID from hospital details
 
-        # Merging vet and hospital details
+        # Merge veterinarian and hospital details
         joined_result = {**vet_details, **hospital_details}
-        joined_results.append(joined_result)
+        joined_results.append(joined_result)  # Append joined result to the list
+
     return {
         'statusCode': 200,
         'body': json.dumps({'message': 'Items retrieved successfully', 'items': joined_results}, cls=JSONEncoder)
-
     }
