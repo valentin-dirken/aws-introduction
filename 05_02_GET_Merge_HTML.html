@@ -10,7 +10,7 @@
     <div class="container">
         <h1>User Management - Spring 2024</h1>
 
-        <!-- Read Users Table -->
+        <!-- Display Doctors and Hospitals -->
         <h2>Doctors and Hospitals</h2>
         <table class="table">
             <thead>
@@ -31,26 +31,26 @@
             const url = 'https://36z24tcxw8.execute-api.us-east-1.amazonaws.com/dev/doctors-hospitals'; // Replace with your actual API endpoint
 
             fetch(url)
-                .then(response => response.json())
+                .then(response => response.json())  // Parse response as JSON
                 .then(data => {
-                    const items = JSON.parse(data.body).items; // Extracting items from the response
+                    const items = JSON.parse(data.body).items; // Extract items from the response body
 
-                    const tableBody = document.getElementById('userTableBody');
+                    const tableBody = document.getElementById('userTableBody'); // Get reference to the table body element
 
                     // Clear existing rows
                     tableBody.innerHTML = '';
 
                     // Populate table rows with doctor and hospital data
                     items.forEach(item => {
-                        const row = document.createElement('tr');
-                        row.innerHTML = '<td>' + item.name.S + '</td>' +
-                            '<td>' + item.hospi_name.S + '</td>';
+                        const row = document.createElement('tr'); // Create a new table row element
+                        row.innerHTML = '<td>' + item.name + '</td>' +  // Set inner HTML of the row with doctor name
+                            '<td>' + item.hospi_name + '</td>';  // Add hospital name as another cell
 
-                        tableBody.appendChild(row);
+                        tableBody.appendChild(row); // Append the row to the table body
                     });
                 })
                 .catch(error => {
-                    console.error('Unable to fetch doctors and hospitals. Error:', error);
+                    console.error('Unable to fetch doctors and hospitals. Error:', error); // Log error if fetching fails
                 });
         }
 
