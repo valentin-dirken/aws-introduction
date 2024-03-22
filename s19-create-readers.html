@@ -11,7 +11,7 @@
         <h1>Readers of School 19</h1>
 
         <!-- Read Users Table -->
-        <h2>Users</h2>
+        <h2>Readers</h2>
         <table class="table">
             <thead>
                 <tr>
@@ -25,8 +25,8 @@
             </tbody>
         </table>
 
-        <!-- Create User Form -->
-        <h2>Create User</h2>
+        <!-- // TODO : adapt the code -->
+        <h2>Create a reader</h2>
         <form id="createUserForm" method="post">
             <div class="mb-3">
                 <label for="name" class="form-label">firstname</label>
@@ -67,6 +67,7 @@
             // 		<td>value 1</td><td>value 2</td>
             //	</tr>
 
+                    // TODO : adapt the code
                     users.forEach(user => {
                         const row = document.createElement('tr');
                         row.innerHTML = '<td>' + user.id + '</td>' +
@@ -85,13 +86,13 @@
         // Function to create a new user using the API
         function createUser(event) {
             event.preventDefault();
-
+            // TODO : adapt the code
             const form = event.target;
             const firstname = form.firstname.value;
             const lastname = form.lastname.value;
-            
+            // TODO : adapt the code
             const url = 'https://ietxaa5m19.execute-api.eu-central-1.amazonaws.com/dev/readers/';
-
+            // TODO : adapt the code
             const newUser = {
                     firstname: firstname,
                 lastname: lastname
