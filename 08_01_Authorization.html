@@ -20,6 +20,8 @@
     <p id="message"></p>
 
     <script>
+        var key; // Déclarer la variable key globalement
+
         // Function to set a cookie
         function setCookie(name, value, days) {
             var expires = "";
@@ -57,7 +59,7 @@
             var password = document.getElementById('password').value;
 
             // Encode key for authentication
-            var key = btoa(username + ':' + password);
+            key = btoa(username + ':' + password);
 
             // Make GET request to API endpoint only if not already authenticated
             if (!getCookie('authenticated')) {
@@ -87,27 +89,7 @@
             if (authenticated) {
                 document.getElementById('authSection').innerHTML = '<p>You are logged in. <a href="#" onclick="logout()">Logout</a></p>';
                 document.getElementById('message').textContent = '';
-
-                var xhr = new XMLHttpRequest();
-                xhr.open('GET', 'https://36z24tcxw8.execute-api.us-east-1.amazonaws.com/dev/tests', true);
-                xhr.setRequestHeader('Authorization', 'Basic ' + key);
-
-                xhr.onload = function() {
-                    if (xhr.status == 200) {
-                        setCookie('authenticated', key, 1);
-                        updateUI(true);
-                    } else {
-                        updateUI(false);
-                    }
-                };
-
-                xhr.onerror = function() {
-                    updateUI(false);
-                };
-
-                xhr.send();
-
-                
+              
             } else {
                 document.getElementById('message').textContent = 'Unauthorized access';
             }
