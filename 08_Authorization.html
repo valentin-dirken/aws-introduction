@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Authentication Page</title>
+</head>
+<body>
+    <h2>Authentication Required</h2>
+    <div id="authSection">
+        <form id="authForm" onsubmit="authenticate(event)">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required><br><br>
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required><br><br>
+            <input type="submit" value="Login">
+        </form>
+    </div>
+
+    <p id="message"></p>
+
+    <script>
+        // Function to set a cookie
+        function setCookie(name, value, days) {
+            var expires = "";
+            if (days) {
+                var date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (value || "") + expires + "; path=/";
+        }
+
+        // Function to get a cookie
+        function getCookie(name) {
+            var nameEQ = name + "=";
+            var ca = document.cookie.split(';');
+            for(var i=0;i < ca.length;i++) {
+                var c = ca[i];
+                while (c.charAt(0) == ' ') c = c.substring(1, c.length);
+                if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+            }
+            return null;
+        }
+
+        // Function to delete a cookie
+        function eraseCookie(name) {   
+            document.cookie = name +'=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+        }
+
+        // Function to handle authentication
+        function authenticate(event) {
+            event.preventDefault(); // Prevent form submission
+            
+            // Retrieve username and password from form
+            var username = document.getElementById('username').value;
+            var password = document.getElementById('password').value;
+
+            // Check if user is already authenticated
+            if (getCookie('authenticated') === 'true') {
+                // User is already authenticated, display message
+                document.getElementById('message').textContent = 'Already authenticated!';
+            } else {
+                // Encode username and password for Basic Authentication
+                var auth = btoa(username + ':' + password);
+
+                // Make GET request to API endpoint
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', 'https://36z24tcxw8.execute-api.us-east-1.amazonaws.com/dev/tests', true);
+
+                // Set Authorization header with Basic authentication
+                xhr.setRequestHeader('Authorization', 'Basic ' + auth);
+
+                xhr.onload = function() {
+                    if (xhr.status == 200) {
+                        // Authentication successful, set cookie
+                        setCookie('authenticated', 'true', 1);
+                        // Update UI
+                        document.getElementById('authSection').innerHTML = '<p>You are logged in. <a href="#" onclick="logout()">Logout</a></p>';
+                        // Clear message
+                        document.getElementById('message').textContent = '';
+                    } else {
+                        // Authentication failed
+                        document.getElementById('message').textContent = 'Unauthorized access';
+                    }
+                };
+                xhr.onerror = function() {
+                    // Error in request
+                    document.getElementById('message').textContent = 'Error in request';
+                };
+                xhr.send();
+            }
+        }
+
+        // Function to handle logout
+        function logout() {
+            // Delete authentication cookie
+            eraseCookie('authenticated');
+            // Reload page to reset authentication state
+            location.reload();
+        }
+
+        // Check if user is already authenticated on page load
+        window.onload = function() {
+            if (getCookie('authenticated') === 'true') {
+                // User is already authenticated, display message
+                document.getElementById('message').textContent = 'Already authenticated!';
+                // Update UI
+                document.getElementById('authSection').innerHTML = '<p>You are logged in. <a href="#" onclick="logout()">Logout</a></p>';
+            }
+        }
+    </script>
+</body>
+</html>
