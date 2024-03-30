@@ -4,25 +4,26 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Stripe Payment Simulation</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://js.stripe.com/v3/"></script>
 </head>
 <body>
-    <h2>Stripe Payment Simulation</h2>
-    <form id="payment-form">
-        <div>
-            <label for="card-element">
-                Credit or debit card
-            </label>
-            <div id="card-element">
-                <!-- A Stripe Element will be inserted here. -->
+    <div class="container">
+        <h2 class="mt-5 mb-4">Stripe Payment Simulation</h2>
+        <form id="payment-form">
+            <div class="form-group">
+                <label for="card-element">Credit or debit card</label>
+                <div id="card-element" class="form-control">
+                    <!-- A Stripe Element will be inserted here. -->
+                </div>
+                <!-- Used to display form errors. -->
+                <div id="card-errors" role="alert" class="invalid-feedback"></div>
             </div>
 
-            <!-- Used to display form errors. -->
-            <div id="card-errors" role="alert"></div>
-        </div>
-
-        <button type="submit">Submit Payment</button>
-    </form>
+            <button type="submit" class="btn btn-primary">Submit Payment</button>
+        </form>
+    </div>
 
     <script>
         // Set your publishable key
@@ -47,7 +48,6 @@
                     errorElement.textContent = result.error.message;
                 } else {
                     // Send the token to your server.
-                    // You would typically send the token to your server here.
                     // Here, for simulation, we just log the token.
                     console.log(result.token);
                     alert('Payment successful! Token: ' + result.token.id);
