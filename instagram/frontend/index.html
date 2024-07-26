@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Instagram</title>
+    <link rel="stylesheet" href="style.css" type="text/css" />
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.1/css/all.css" integrity="sha384-5sAR7xN1Nv6T6+dT2mhtzEpVJvfS3NScPQTrOxhwjIuvcA67KV2R5Jz6kr4abQsz" crossorigin="anonymous">
+    <script src="https://kit.fontawesome.com/17dc9cbf51.js" crossorigin="anonymous"></script>
+<style>
+    /* Optional: Additional CSS styles for better appearance */
+    #imagePreview {
+        margin-top: 10px;
+    }
+
+    #previewImg {
+        max-width: 100%;
+        height: auto;
+    }
+
+    /* Instagram-like filters */
+    .clarendon {
+        filter: contrast(1.2) saturate(1.35);
+    }
+
+    .gingham {
+        filter: brightness(1.05) hue-rotate(-10deg);
+    }
+
+    .moon {
+        filter: grayscale(1) contrast(1.1) brightness(1.1);
+    }
+
+    .lark {
+        filter: contrast(0.9) brightness(1.15) saturate(1.35);
+    }
+
+    .reyes {
+        filter: saturate(0.75) brightness(1.1) contrast(0.85);
+    }
+
+    .juno {
+        filter: contrast(1.15) brightness(1.15) saturate(1.8);
+    }
+
+</style>
+</head>
+<body>
+<nav class="navbar navbar-light sticky-top bg-light">
+    <a class="navbar-brand" href="#"><i class="fab fa-instagram"></i> Ascend by Deloitte</a>
+    <ul class="nav ">
+        <li class="nav-item">
+            <button type="button" class="btn btn-primary btn-md btn-success"data-toggle="modal" data-target="#exampleModal">Create a new post</button>
+        </li>
+        <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" aria-expanded="false"><i class="fas fa-cogs"></i></a>
+            <div class="dropdown-menu dropdown-menu-right">
+                <a class="dropdown-item" href="#">Action</a>
+                <a class="dropdown-item" href="#">Another action</a>
+                <a class="dropdown-item" href="#">Something else here</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item" href="#">Log Out</a>
+            </div>
+        </li>
+
+    </ul>
+</nav>
+
+<!-- Modal Begin -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog"
+     aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Create a new post</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="caption">
+                    <div class="form-group">
+                        <label for="formGroupExampleInput2">Caption</label>
+                        <input type="text" class="form-control" id="formGroupExampleInput2" placeholder="Add the caption of your post here">
+                        <!-- Hidden file input -->
+                        <input type="file" id="imageInput" style="display:none;" accept="image/*">
+                        <button type="button" class="btn btn-secondary mt-2" id="cameraButton">
+                            <i class="fa-solid fa-camera" aria-hidden="true"></i>
+                        </button>
+                        <button type="button" class="btn btn-secondary mt-2" id="locationButton">
+                            <i class="fa-solid fa-location-dot" aria-hidden="true"></i>
+                        </button>
+                    </div>
+                    <!-- Image preview -->
+                    <div id="imagePreview" class="mt-3">
+                        <img id="previewImg" src="#" alt="Image preview" style="display:none; max-width: 100%; height: auto;">
+                    </div>
+                    <!-- Filter selection 
+                    <div id="filterSelection" class="mt-3" style="display:none;">
+                        <label for="filterSelect">Select Filter</label>
+                        <select id="filterSelect" class="form-control">
+                            <option value="none">None</option>
+                            <option value="clarendon">Clarendon</option>
+                            <option value="gingham">Gingham</option>
+                            <option value="moon">Moon</option>
+                            <option value="lark">Lark</option>
+                            <option value="reyes">Reyes</option>
+                            <option value="juno">Juno</option>
+                        </select>
+                    </div>-->
+                    <!-- Location display -->
+                    <div id="locationDisplay" class="mt-3" style="display:none;">
+                        <label for="locationInput">Location</label>
+                        <input type="text" class="form-control" id="locationInput" readonly>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" id="saveChangesButton">Publish</button>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal End -->
+
+<!-- JavaScript to handle file input, preview, location, filter, and form submission -->
+<script>
+    document.getElementById('cameraButton').addEventListener('click', function() {
+        document.getElementById('imageInput').click();
+    });
+
+    document.getElementById('imageInput').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('previewImg').src = e.target.result;
+                document.getElementById('previewImg').style.display = 'block';
+            }
+            reader.readAsDataURL(file);
+        }
+    });
+
+    document.getElementById('locationButton').addEventListener('click', function() {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(function(position) {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+
+                // Use a geocoding service to get the city name
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const city = data.address.city || data.address.town || data.address.village;
+                        if (city) {
+                            document.getElementById('locationInput').value = city;
+                            document.getElementById('locationDisplay').style.display = 'block';
+                        } else {
+                            alert('City not found');
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching location:', error);
+                        alert('Error fetching location');
+                    });
+            }, function(error) {
+                console.error('Error getting location:', error);
+                alert('Error getting location');
+            });
+        } else {
+            alert('Geolocation is not supported by this browser.');
+        }
+    });
+
+    /*document.getElementById('filterSelect').addEventListener('change', function() {
+        const filter = this.value;
+        const previewImg = document.getElementById('previewImg');
+        // Remove existing filter classes
+        previewImg.className = '';
+        // Add the selected filter class
+        if (filter !== 'none') {
+            previewImg.classList.add(filter);
+        }
+    });*/
+
+    document.getElementById('saveChangesButton').addEventListener('click', function() {
+        const caption = document.getElementById('formGroupExampleInput2').value;
+        const location = document.getElementById('locationInput').value;
+        const fileInput = document.getElementById('imageInput');
+        const file = fileInput.files[0];
+        
+        if (!file) {
+            alert('Please select an image.');
+            return;
+        }
+		if (!caption) {
+            alert('Please write a caption.');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = function() {
+            const imageData = reader.result.split(',')[1]; // Extract base64 part
+            const payload = {
+                caption: caption,
+                location: location,
+                image: imageData,
+                filename: file.name
+            };
+
+            fetch('https://8zfn5ddve5.execute-api.us-east-1.amazonaws.com/dev/photos', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                //alert('Upload successful');
+
+                // Close the modal (assuming you're using Bootstrap or similar)
+                //const modal = bootstrap.Modal.getInstance(document.getElementById('uploadModal'));
+
+				// Close the modal (Bootstrap 4 way)
+                // Close the modal (Bootstrap 5 way)
+                const exampleModal = new bootstrap.Modal(document.getElementById('exampleModal'));
+                exampleModal.hide();
+				$('#exampleModal').modal('hide')
+
+                // Refresh the list of photos
+                fetch('https://8zfn5ddve5.execute-api.us-east-1.amazonaws.com/dev/photos')
+                    .then(response => response.json())
+                    .then(data => {
+                        const posts = JSON.parse(data.body);
+                        const postsContainer = document.getElementById('postsContainer');
+                        postsContainer.innerHTML = ''; // Clear existing posts
+
+                        posts.forEach(item => {
+                            const postHTML = `
+                                <div class="card mx-auto custom-card" id="${item.publicationID}">
+                                    <div class="row post-header col-12 py-2 px-3">
+                                        <div class="col-6 float-left"><h4>${item.location || 'Unknown Location'}</h4></div>
+                                        <div class="col-6 float-right text-right post-number"><h4>${new Date(item.timestamp).toLocaleString()}</h4></div>
+                                    </div>
+                                    <img class="card-img" src="${item.imageUrl}" alt="Card image cap">
+                                    <div class="card-body px-3">
+                                        <h5 class="card-title">Number of likes: 1000 Likes</h5>
+                                        <p class="card-text">${item.caption}</p>
+                                    </div>
+                                    <div class="row post-header px-3 pb-3">
+                                        <div class="col-1 float-left text-left"><i class="far fa-heart"></i></div>
+                                        <div class="col-10 float-left text-left">Comment...</div>
+                                        <div class="col-1 float-right text-right"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></div>
+                                    </div>
+                                </div><br /><br /><br />
+                            `;
+                            postsContainer.insertAdjacentHTML('beforeend', postHTML);
+                        });
+                    })
+                    .catch(error => console.error('Error fetching posts:', error));
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Upload failed');
+            });
+        }
+        reader.readAsDataURL(file);
+    });
+</script>
+
+
+
+
+
+
+<div class="container-fluid ">
+   
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div id="home" class="container-fluid tab-pane active "><br>
+            <div class="row justify-content-center">
+                <div class="">
+				<div class="container" id="postsContainer"></div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('https://8zfn5ddve5.execute-api.us-east-1.amazonaws.com/dev/photos')
+            .then(response => response.json())
+            .then(data => {
+                // Parse the response body as JSON
+                const posts = JSON.parse(data.body);
+                
+                // Get the container where posts will be inserted
+                const postsContainer = document.getElementById('postsContainer');
+                
+                // Iterate over each item in the posts array
+                posts.forEach(item => {
+                    // Create HTML for each post
+                    const postHTML = `
+                        <br /><br /><div class="card mx-auto custom-card" id="${item.publicationID}">
+                            <div class="row post-header col-12 py-2 px-3">
+                                <div class="col-6 float-left"><h4>${item.location || 'Unknown Location'}</h4></div>
+                                <div class="col-6 float-right text-right post-number"><h4>${new Date(item.timestamp).toLocaleString()}</h4></div>
+                            </div>
+                            <img class="card-img" src="${item.imageUrl}" alt="Card image cap">
+                            <div class="card-body px-3">
+                                <h5 class="card-title">Number of likes: 1000 Likes</h5>
+                                <p class="card-text">${item.caption}</p>
+                            </div>
+                            <div class="row post-header px-3 pb-3">
+                                <div class="col-1 float-left text-left"><i class="far fa-heart"></i></div>
+                                <div class="col-10 float-left text-left">Comment...</div>
+                                <div class="col-1 float-right text-right"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></div>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // Insert the HTML into the posts container
+                    postsContainer.insertAdjacentHTML('beforeend', postHTML);
+                });
+            })
+            .catch(error => console.error('Error fetching posts:', error));
+    });
+</script>
+
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+</body>
+</html>
