@@ -1,0 +1,100 @@
+<!-- Add Comment Section to Existing HTML -->
+<div id="postsContainer"></div>
+
+<!-- Add Comment Modal -->
+<div class="modal fade" id="commentModal" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="commentModalLabel">Add Comment</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <textarea id="commentText" class="form-control" placeholder="Enter your comment here"></textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" id="submitCommentButton" class="btn btn-primary">Add Comment</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fetch and display posts
+        fetch('https://8zfn5ddve5.execute-api.us-east-1.amazonaws.com/dev/photos')
+            .then(response => response.json())
+            .then(data => {
+                const postsContainer = document.getElementById('postsContainer');
+                data.forEach(item => {
+                    const commentsHTML = item.comments.map(comment => `<p>${comment}</p>`).join('');
+                    const postHTML = `
+                        <div class="card mx-auto custom-card" id="${item.publicationID}">
+                            <div class="row post-header col-12 py-2 px-3">
+                                <div class="col-6 float-left"><h4>${item.location || 'Unknown Location'}</h4></div>
+                                <div class="col-6 float-right text-right post-number"><h4>${new Date(item.timestamp).toLocaleString()}</h4></div>
+                            </div>
+                            <img class="card-img" src="${item.imageUrl}" alt="Card image cap">
+                            <div class="card-body px-3">
+                                <h5 class="card-title">Number of likes: 1000 Likes</h5>
+                                <p class="card-text">${item.caption}</p>
+                                <div class="comments-section">
+                                    <h6>Comments:</h6>
+                                    ${commentsHTML}
+                                    <button class="btn btn-link add-comment" data-id="${item.publicationID}">Add Comment</button>
+                                </div>
+                            </div>
+                            <div class="row post-header px-3 pb-3">
+                                <div class="col-1 float-left text-left"><i class="far fa-heart"></i></div>
+                                <div class="col-10 float-left text-left">Comment...</div>
+                                <div class="col-1 float-right text-right"><i class="fa fa-ellipsis-v" aria-hidden="true"></i></div>
+                            </div>
+                        </div>
+                    `;
+                    postsContainer.insertAdjacentHTML('beforeend', postHTML);
+                });
+
+                // Add event listeners for comment buttons
+                document.querySelectorAll('.add-comment').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const publicationID = this.dataset.id;
+                        document.getElementById('commentModal').dataset.id = publicationID;
+                        new bootstrap.Modal(document.getElementById('commentModal')).show();
+                    });
+                });
+            })
+            .catch(error => console.error('Error fetching posts:', error));
+
+        // Handle comment submission
+        document.getElementById('submitCommentButton').addEventListener('click', function() {
+            const publicationID = document.getElementById('commentModal').dataset.id;
+            const commentText = document.getElementById('commentText').value;
+
+            if (!commentText.trim()) {
+                alert('Please enter a comment.');
+                return;
+            }
+
+            fetch('https://8zfn5ddve5.execute-api.us-east-1.amazonaws.com/dev/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    publicationID: publicationID,
+                    comment: commentText
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Success:', data);
+                alert('Comment added successfully');
+                document.getElementById('commentText').value = '';  // Clear the input
+                new bootstrap.Modal(document.getElementById('commentModal')).hide();
+                // Refresh the posts to show the new comment
+                fetch('https://8zfn5ddve5.execute-api.us-east-1.amazonaws.com/dev/photos')
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById('postsContainer').innerHTML = '';
+                        data.forEach(item => {
