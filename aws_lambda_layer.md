@@ -1,4 +1,6 @@
-```markdown
+mkdir -p multi-agent-orchestrator/nodejs && cd multi-agent-orchestrator/nodejs && echo '{"private": true}' > package.json && npm install multi-agent-orchestrator && cd .. && zip -r multi-agent-orchestrator.zip nodejs
+aws lambda publish-layer-version --layer-name multi-agent-orchestrator --zip-file fileb://multi-agent-orchestrator.zip
+
 # Define the layer name and NPM packages
 ```bash
 LAYER_NAME="dmit-mssql-v1"
