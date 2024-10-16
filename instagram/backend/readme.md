@@ -6,4 +6,4 @@
 | `caption`          | `String`      | Description or caption for the publication |
 | `location`         | `String`      | Location related to the publication |
 | `imageFilename`    | `String`      | Filename of the associated image    |
-| `timestamp`        | `Number`      | Time when the publication was created (Unix timestamp) |
+| `timestamp`        | `String`      | Time when the publication was created (Unix timestamp) |
