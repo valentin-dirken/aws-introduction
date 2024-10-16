@@ -1,7 +1,9 @@
-DynamoDB Structure : 
+## DynamoDB Structure
 
-publicationID
-caption
-location
-imageFilename
-timestamp
+| **Attribute Name** | **Data Type** | **Description**       |
+|--------------------|---------------|-----------------------|
+| `publicationID`    | `String`      | Unique identifier for the publication |
+| `caption`          | `String`      | Description or caption for the publication |
+| `location`         | `String`      | Location related to the publication |
+| `imageFilename`    | `String`      | Filename of the associated image    |
+| `timestamp`        | `Number`      | Time when the publication was created (Unix timestamp) |
